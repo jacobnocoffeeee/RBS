@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:17.5
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_NAME}
+    restart: always
+    volumes:
+      - ../db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - /home/$USER/pgdata:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: simple_app
+    image: simple_app:git_beta
+    depends_on:
+    - db
+    environment:
+      PG_HOST: db
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_NAME: ${PG_NAME}
+      PGSSLMODE: disable
+    restart: always
+    ports:
+      - "8080:8080"
+
+  nginx:
+    image: nginx:1.29
+    depends_on:
+    - app
+    volumes:
+      - ../nginx:/etc/nginx
+    restart: always
+    ports: 
+      - "80:80"
