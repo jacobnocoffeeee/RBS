@@ -16,9 +16,9 @@ jobs:
           PG_USER: ${{ secrets.PG_USER }}
           PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
           PG_NAME: ${{ secrets.PG_NAME }}
-          
+          SERVER_IP: ${{ secrets.SSH_HOST }} 
         with:
-          envs: PG_USER,PG_PASSWORD,PG_NAME
+          envs: PG_USER,PG_PASSWORD,PG_NAME,SERVER_IP
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
