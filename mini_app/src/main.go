@@ -18,7 +18,7 @@ func connectDBWithRetry() (*sql.DB, error) {
 		os.Getenv("PG_USER"),
 		os.Getenv("PG_PASSWORD"),
 		os.Getenv("PG_NAME"),
-		os.Getenv("PGSSLMODE"), // например, "disable"
+		os.Getenv("PGSSLMODE"),
 	)
 
 	var db *sql.DB
@@ -81,6 +81,20 @@ func main() {
 
 		c.Header("Content-Type", "text/html")
 		c.String(http.StatusOK, html)
+	})
+
+	// Простой POST запрос для добавления данных
+	r.POST("/add", func(c *gin.Context) {
+		city := c.PostForm("city")
+		temp := c.PostForm("temp")
+
+		_, err := db.Exec("INSERT INTO weather (city, temperature) VALUES ($1, $2)", city, temp)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось сохранить данные"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Данные добавлены"})
 	})
 
 	if err := r.Run(":8080"); err != nil {
